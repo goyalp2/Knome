@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "34553582650",
+    "firebase_url": "https://knome-aff07.firebaseio.com",
+    "project_id": "knome-aff07",
+    "storage_bucket": "knome-aff07.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:34553582650:android:990733d043728949",
+        "android_client_info": {
+          "package_name": "com.example.knome"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "34553582650-ovrllk6jlbmihjvduu62jdm3sg3nn74q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.knome",
+            "certificate_hash": "7d7fda7cba4e828b569ed61023f3f6552829a6e6"
+          }
+        },
+        {
+          "client_id": "34553582650-v0ntcv1f4bv0cjg7frsqmtu2tpkt5eir.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASUHN96WONpwR2qchLgE3uSu2OftVdNqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "34553582650-v0ntcv1f4bv0cjg7frsqmtu2tpkt5eir.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

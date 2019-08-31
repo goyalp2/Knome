@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Knome</string>
+    <string name="signup_info">No account yet?</string>
+    <string name="signup_link">Create one</string>
+    <string name="signin_using">Sign in using :</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="type_here">Type here.....</string>
+</resources>
