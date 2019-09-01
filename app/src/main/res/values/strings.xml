@@ -6,4 +6,7 @@
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="type_here">Type here.....</string>
+    <string name="password">Password</string>
+    <string name="confirmPassword">Confirm Password</string>
+    <string name="loading">Signing-up</string>
 </resources>

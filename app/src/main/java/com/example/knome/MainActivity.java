@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,21 +13,28 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-    @BindView(R.id.email) EditText email;
-    @BindView(R.id.password) EditText password;
-    @BindView(R.id.login) Button login;
-  //  @BindView(R.id.signup) Button signup;
+    public FirebaseAuth mAuth;
+    @BindView(R.id.login) Button mLoginBtn;
+    @BindView(R.id.signup) Button mSignupBtn;
+    @BindView(R.id.email) EditText mLoginEmail;
+    //EditText mLoginEmail = findViewById(R.id.email);
+    ProgressActivity object = new ProgressActivity();
+    EditText mLoginPass = findViewById(R.id.password);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
-        Button signup=findViewById(R.id.signup);
+
+        ProgressActivity object = new ProgressActivity();
+        SignInActivity SignInObject = new SignInActivity();
+        ButterKnife.bind(this);
+    //    Button signup=findViewById(R.id.signup);
         //        signup.setClickable(true);
-        signup.setOnClickListener(new View.OnClickListener() {
+        mSignupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, SignupActivity.class);
@@ -34,12 +42,28 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        mLoginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String loginEmail = mLoginEmail.getText().toString();
+                String loginPass = mLoginPass.getText().toString();
+                SignInObject.signIn(loginEmail,loginPass);
+            }
+        });
     }
     @Override
     public void onStart(){
         super.onStart();
         FirebaseUser currentUser=mAuth.getCurrentUser();
-    //    updateUI(currentUser);
+        updateUI(currentUser);
+    }
+    private void updateUI(FirebaseUser user) {
+        object.hideProgressDialog();
+        if(user!=null){
+            Toast.makeText(this,"User already signed-in",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this,"Sign-in unsuccessful",Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
