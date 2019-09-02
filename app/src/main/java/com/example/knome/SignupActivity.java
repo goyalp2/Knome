@@ -1,5 +1,6 @@
 package com.example.knome;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -23,6 +24,7 @@ import butterknife.ButterKnife;
 public class SignupActivity extends ProgressActivity {
 
     private FirebaseAuth mAuth;
+
     private static final String TAG = "SignupActivity";
     @BindView(R.id.firstName_inp) EditText mFirstNameInp;
     @BindView(R.id.lastName_inp) EditText mLastNameInp;
@@ -37,19 +39,21 @@ public class SignupActivity extends ProgressActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         mAuth = FirebaseAuth.getInstance();
-        ButterKnife.bind(this);
+        ButterKnife.bind(SignupActivity.this);
+
         mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int i = view.getId();
                 if(i == R.id.submit){
+
                     createAccount(mEmailInp.getText().toString(),mConfirmPwdInp.getText().toString());
                 }
 
             }
         });
                 Toolbar myToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+                setSupportActionBar(myToolbar);
 
     }
     @Override
@@ -60,6 +64,7 @@ public class SignupActivity extends ProgressActivity {
         updateUI(currentUser);
         //Toast.makeText(this,"User already registered",Toast.LENGTH_SHORT).show();
     }
+
 
     private void createAccount(String email, String password) {
 
@@ -91,10 +96,9 @@ public class SignupActivity extends ProgressActivity {
                             // If sign in fails, display a message to the user.
 
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
+                            Toast.makeText(SignupActivity.this, "Already Signed-Up.",Toast.LENGTH_SHORT).show();
 
-                            Toast.makeText(SignupActivity.this, "Authentication failed.",
 
-                                    Toast.LENGTH_SHORT).show();
 
                             updateUI(null);
 
@@ -104,7 +108,6 @@ public class SignupActivity extends ProgressActivity {
                         if (!task.isSuccessful()) {
 
                             Log.w(TAG, "signUpWithEmail:failure", task.getException());
-                            Toast.makeText(SignupActivity.this,"Sign-in Unsuccessful",Toast.LENGTH_SHORT).show();
 
                         }
 
@@ -115,9 +118,11 @@ public class SignupActivity extends ProgressActivity {
     private void updateUI(FirebaseUser user) {
         hideProgressDialog();
         if(user!=null){
-            Toast.makeText(SignupActivity.this,"User already signed-in",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(SignupActivity.this,"User already signed-in",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(SignupActivity.this,ShowActivity.class);
+            startActivity(intent);
         } else {
-            Toast.makeText(SignupActivity.this,"Sign-up unsuccessful",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(SignupActivity.this,"Sign-up unsuccessful",Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -9,4 +9,7 @@
     <string name="password">Password</string>
     <string name="confirmPassword">Confirm Password</string>
     <string name="loading">Signing-up</string>
+    <string name="location_text">"Latitude: %1$.4f \n Longitude: %2$.4f
+    \n Timestamp: %3$tr"</string>
+    <string name="no_location">No location detected</string>
 </resources>

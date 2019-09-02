@@ -12,35 +12,41 @@ import com.google.android.gms.common.util.VisibleForTesting;
 public class ProgressActivity extends AppCompatActivity {
     @VisibleForTesting
     public ProgressDialog mProgressDialog;
+    public ProgressDialog mSignInProgress;
     public void showProgressDialog() {
 
         if (mProgressDialog == null) {
 
             mProgressDialog = new ProgressDialog(this);
-
             mProgressDialog.setMessage(getString(R.string.loading));
-
             mProgressDialog.setIndeterminate(true);
 
         }
-
-
-
         mProgressDialog.show();
-
     }
-
-
 
     public void hideProgressDialog() {
 
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
 
+            mProgressDialog.cancel();
             mProgressDialog.dismiss();
 
         }
 
     }
+    public void showSignInDialog(){
+        if(mSignInProgress == null){
+            mSignInProgress = new ProgressDialog(this);
+            mSignInProgress.setMessage("Signing-in");
+            mSignInProgress.setIndeterminate(true);
+        }
+
+        mSignInProgress.show();
+    }
+
+
+
 
 
 
