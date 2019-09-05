@@ -98,7 +98,8 @@ public class SignupActivity extends ProgressActivity {
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(SignupActivity.this, "Already Signed-Up.",Toast.LENGTH_SHORT).show();
 
-
+                            Intent intent = new Intent(SignupActivity.this, ShowActivity.class);
+                            startActivity(intent);
 
                             updateUI(null);
 

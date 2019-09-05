@@ -8,8 +8,13 @@
     <string name="type_here">Type here.....</string>
     <string name="password">Password</string>
     <string name="confirmPassword">Confirm Password</string>
-    <string name="loading">Signing-up</string>
+    <string name="signing_up">Signing-up</string>
+    <string name="loading">Loading</string>
     <string name="location_text">"Latitude: %1$.4f \n Longitude: %2$.4f
     \n Timestamp: %3$tr"</string>
     <string name="no_location">No location detected</string>
+    <string name="service_not_avail">Service not available</string>
+    <string name="invalid_lat_long">Invalid latitude and longitude</string>
+    <string name="no_string_found">No string found</string>
+    <string name="address_text">"Address: %1$s \n Timestamp: %2$tr"</string>
 </resources>

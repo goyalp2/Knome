@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,7 +19,7 @@ public class ProgressActivity extends AppCompatActivity {
         if (mProgressDialog == null) {
 
             mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setMessage(getString(R.string.signing_up));
             mProgressDialog.setIndeterminate(true);
 
         }
@@ -29,8 +30,10 @@ public class ProgressActivity extends AppCompatActivity {
 
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
 
-            mProgressDialog.cancel();
             mProgressDialog.dismiss();
+            Toast.makeText(this,"hideProgressDialog",Toast.LENGTH_SHORT).show();
+         //   mProgressDialog.hide();
+          //  mProgressDialog.dismiss();
 
         }
 

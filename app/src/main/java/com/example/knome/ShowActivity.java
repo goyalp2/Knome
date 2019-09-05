@@ -1,6 +1,8 @@
 package com.example.knome;
 
 import android.Manifest;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,11 +22,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class ShowActivity extends MainActivity {
+public class ShowActivity extends MainActivity implements FetchAddressTask.OnTaskCompleted {
     public FirebaseAuth mAuth;
     public final int REQUEST_LOCATION_PERMISSION = 1;
     public FusedLocationProviderClient mFusedLocationClient;
-    public Location mLastLocation;
+    public AnimatorSet mAnimRotate;
+    public Boolean mTrackingLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +37,13 @@ public class ShowActivity extends MainActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         TextView mName = findViewById(R.id.ShowName);
         TextView mEmail = findViewById(R.id.ShowEmail);
+        TextView mLocation = findViewById(R.id.ShowLocation);
         Button mLogoutBtn = findViewById(R.id.logout);
+        mAnimRotate = (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.rotate);
+        mAnimRotate.setTarget(mLocation);
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        getLocation();
+        startTrackingLocation();
 
         mLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +61,7 @@ public class ShowActivity extends MainActivity {
                 // otherwise, show a Toast
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLocation();
+                    startTrackingLocation();
                 } else {
                     Toast.makeText(this, "Location permission required",Toast.LENGTH_SHORT).show();
                     signOut();
@@ -64,7 +70,7 @@ public class ShowActivity extends MainActivity {
         }
     }
 
-    private void getLocation(){
+    private void startTrackingLocation(){
         TextView mLocation = findViewById(R.id.ShowLocation);
 
         if (ActivityCompat.checkSelfPermission(this,
@@ -79,24 +85,25 @@ public class ShowActivity extends MainActivity {
                         @Override
                         public void onSuccess(Location location) {
                             if (location != null) {
-                                mLastLocation = location;
-                                mLocation.setText(
-                                    getString(R.string.location_text,
-                                    mLastLocation.getLatitude(),
-                                    mLastLocation.getLongitude(),
-                                    mLastLocation.getTime())
-                                );
+                                new FetchAddressTask(ShowActivity.this,
+                                        ShowActivity.this).execute(location);
                             } else {
                                 mLocation.setText(R.string.no_location);
                             }
                         }
                     });
         }
+        mLocation.setText(getString(R.string.address_text,getString(R.string.loading),System.currentTimeMillis()));
     }
     private void signOut() {
 
         mAuth.signOut();
         Intent intent = new Intent(ShowActivity.this,MainActivity.class);
         startActivity(intent);
+    }
+    @Override
+    public void onTaskCompleted(String result){
+        TextView mLocation = findViewById(R.id.ShowLocation);
+        mLocation.setText(getString(R.string.address_text,result,System.currentTimeMillis()));
     }
 }

@@ -104,7 +104,6 @@ public class MainActivity extends ProgressActivity {
                         else {
 
                             // If sign in fails, display a message to the user.
-                            hideProgressDialog();
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(MainActivity.this,"Email or password invalid", Toast.LENGTH_SHORT).show();
                             updateUI(null);
@@ -116,10 +115,9 @@ public class MainActivity extends ProgressActivity {
 
                         if (!task.isSuccessful()) {
 
-                            hideProgressDialog();
                             Log.w(TAG, "signUpWithEmail:failure", task.getException());
                             Toast.makeText(MainActivity.this,"Sign-in Unsuccessful",Toast.LENGTH_SHORT).show();
-
+                            updateUI(null);
                         }
 
                         hideProgressDialog();
