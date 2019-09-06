@@ -1,6 +1,8 @@
 package com.example.knome;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,6 +13,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -26,13 +32,24 @@ public class MainActivity extends ProgressActivity {
     @BindView(R.id.email) EditText mLoginEmail;
     @BindView(R.id.password) EditText mLoginPass;
     private static final String TAG = "MainActivity";
+    LocationManager locationManager ;
+    Context context;
+    boolean GpsStatus ;
+    public GoogleSignInClient mGoogleSignInClient;
+    Button mGoogleBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
         Button mLoginBtn = findViewById(R.id.login);
+        mGoogleBtn = findViewById(R.id.Gsign_in_Btn);
+        context = getApplicationContext();
         ButterKnife.bind(this);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         mSignupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +83,11 @@ public class MainActivity extends ProgressActivity {
         super.onStart();
         FirebaseUser currentUser=mAuth.getCurrentUser();
         updateUI(currentUser);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        updateUI_google(account);
     }
+
+
 
     public void signIn(String email, String password){
 
@@ -94,8 +115,15 @@ public class MainActivity extends ProgressActivity {
                             Log.d(TAG, "signInWithEmail:success");
 
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Intent intent = new Intent(MainActivity.this, ShowActivity.class);
-                            startActivity(intent);
+                            CheckGpsStatus() ;
+                            if (GpsStatus == true) {
+                                Intent intent = new Intent(MainActivity.this, ShowActivity.class);
+                                startActivity(intent);
+                            } else{
+                                hideProgressDialog();
+                                Toast.makeText(MainActivity.this,"Please turn on the location",Toast.LENGTH_SHORT).show();
+
+                            }
 
                             updateUI(user);
 
@@ -105,6 +133,7 @@ public class MainActivity extends ProgressActivity {
 
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
+
                             Toast.makeText(MainActivity.this,"Email or password invalid", Toast.LENGTH_SHORT).show();
                             updateUI(null);
 
@@ -167,5 +196,23 @@ public class MainActivity extends ProgressActivity {
             Toast.makeText(this,"Sign-in unsuccessful",Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void updateUI_google(GoogleSignInAccount account) {
+        hideProgressDialog();
+        if(account!=null) {
+            mGoogleBtn.setVisibility(View.INVISIBLE);
+            Toast.makeText(this,"User already signed-in",Toast.LENGTH_SHORT).show();
+        }else {
+        hideProgressDialog();
+        Toast.makeText(this,"Sign-in unsuccessful",Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void CheckGpsStatus(){
+
+        locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+
+        GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
 
 }

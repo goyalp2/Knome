@@ -5,7 +5,6 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,8 +16,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -27,7 +28,7 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
     public final int REQUEST_LOCATION_PERMISSION = 1;
     public FusedLocationProviderClient mFusedLocationClient;
     public AnimatorSet mAnimRotate;
-    public Boolean mTrackingLocation;
+    public Boolean mTrackingLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,6 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
         mAnimRotate.setTarget(mLocation);
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        startTrackingLocation();
 
         mLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,24 +51,22 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
                 signOut();
             }
         });
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_LOCATION_PERMISSION:
-                // If the permission is granted, get the location,
-                // otherwise, show a Toast
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startTrackingLocation();
-                } else {
-                    Toast.makeText(this, "Location permission required",Toast.LENGTH_SHORT).show();
-                    signOut();
-                }
-                break;
+        if (!mTrackingLocation) {
+            startTrackingLocation();
+        } else {
+            stopTrackingLocation();
         }
     }
+
+    LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            if (mTrackingLocation) {
+                new FetchAddressTask(ShowActivity.this, ShowActivity.this)
+                        .execute(locationResult.getLastLocation());
+            }
+        }
+    };
 
     private void startTrackingLocation(){
         TextView mLocation = findViewById(R.id.ShowLocation);
@@ -80,7 +78,12 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         } else {
-            mFusedLocationClient.getLastLocation().addOnSuccessListener(
+            mTrackingLocation = true;
+            mFusedLocationClient.requestLocationUpdates
+                    (getLocationRequest(),
+                            mLocationCallback,
+                            null /* Looper */);
+        /*    mFusedLocationClient.getLastLocation().addOnSuccessListener(
                     new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
@@ -91,9 +94,10 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
                                 mLocation.setText(R.string.no_location);
                             }
                         }
-                    });
+                    });  */
         }
         mLocation.setText(getString(R.string.address_text,getString(R.string.loading),System.currentTimeMillis()));
+        mAnimRotate.start();
     }
     private void signOut() {
 
@@ -101,9 +105,47 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
         Intent intent = new Intent(ShowActivity.this,MainActivity.class);
         startActivity(intent);
     }
+    private void stopTrackingLocation() {
+        if (mTrackingLocation) {
+            mTrackingLocation = false;
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+            signOut();
+            mAnimRotate.end();
+        }
+    }
+    private LocationRequest getLocationRequest() {
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
+    }
+
+    @Override
+    public void onRequestPermissionsResult (int requestCode,
+                                            @NonNull String[] permissions, @NonNull int[] grantResults){
+        switch (requestCode) {
+            case REQUEST_LOCATION_PERMISSION:
+                // If the permission is granted, get the location,
+                // otherwise, show a Toast
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startTrackingLocation();
+                } else {
+                    Toast.makeText(this, "Location permission required", Toast.LENGTH_SHORT).show();
+                    signOut();
+                }
+                break;
+        }
+    }
+
     @Override
     public void onTaskCompleted(String result){
         TextView mLocation = findViewById(R.id.ShowLocation);
-        mLocation.setText(getString(R.string.address_text,result,System.currentTimeMillis()));
+        if(mTrackingLocation == false){
+            mLocation.setText(R.string.no_location);
+        }else {
+            mLocation.setText(getString(R.string.address_text, result, System.currentTimeMillis()));
+        }
     }
 }

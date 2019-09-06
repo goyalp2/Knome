@@ -111,5 +111,14 @@
         app:layout_constraintStart_toStartOf="@+id/login"
         app:layout_constraintTop_toBottomOf="@id/or" />
 
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/Gsign_in_Btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toTopOf="@+id/signup" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

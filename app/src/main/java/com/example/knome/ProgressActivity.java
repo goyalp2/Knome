@@ -30,6 +30,7 @@ public class ProgressActivity extends AppCompatActivity {
 
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
 
+            mProgressDialog.setIndeterminate(false);
             mProgressDialog.dismiss();
             Toast.makeText(this,"hideProgressDialog",Toast.LENGTH_SHORT).show();
          //   mProgressDialog.hide();
