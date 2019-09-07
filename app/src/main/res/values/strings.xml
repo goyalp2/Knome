@@ -17,4 +17,6 @@
     <string name="invalid_lat_long">Invalid latitude and longitude</string>
     <string name="no_string_found">No string found</string>
     <string name="address_text">"Address: %1$s \n Timestamp: %2$tr"</string>
+    <string name="facebook_app_id">565723447296716</string>
+    <string name="fb_login_protocol_scheme">fb565723447296716</string>
 </resources>

@@ -1,0 +1,2 @@
+include ':app', ':samples:SwitchUserSample', ':samples:Scrumptious', ':facebook', ':facebook-login', ':samples:Iconicus', ':samples:PlacesGraphSample', ':facebook-share', ':facebook-common', ':facebook-places', ':facebook-messenger', ':samples:ShareIt', ':samples:FBLoginSample', ':samples:RPSSample', ':samples:MessengerSendSample', ':facebook-core', ':samples:HelloFacebookSample', ':facebook-applinks'
+rootProject.name='Knome'

@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,10 +31,6 @@ public class ProgressActivity extends AppCompatActivity {
 
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.dismiss();
-            Toast.makeText(this,"hideProgressDialog",Toast.LENGTH_SHORT).show();
-         //   mProgressDialog.hide();
-          //  mProgressDialog.dismiss();
-
         }
 
     }

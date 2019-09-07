@@ -1,10 +1,9 @@
 package com.example.knome;
 
 import android.Manifest;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,11 +14,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -27,8 +30,10 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
     public FirebaseAuth mAuth;
     public final int REQUEST_LOCATION_PERMISSION = 1;
     public FusedLocationProviderClient mFusedLocationClient;
-    public AnimatorSet mAnimRotate;
     public Boolean mTrackingLocation = false;
+    private static final String TAG = "MainActivity";
+    LocationManager locationManager ;
+    boolean GpsStatus ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,22 +45,56 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
         TextView mEmail = findViewById(R.id.ShowEmail);
         TextView mLocation = findViewById(R.id.ShowLocation);
         Button mLogoutBtn = findViewById(R.id.logout);
-        mAnimRotate = (AnimatorSet) AnimatorInflater.loadAnimator(this,R.animator.rotate);
-        mAnimRotate.setTarget(mLocation);
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+        CheckGpsStatus();
+        if(GpsStatus == true){
+            Toast.makeText(ShowActivity.this, "Keep GPS on", Toast.LENGTH_SHORT).show();
+        }else{
+            signOut();
+            signOut_google();
+            signOut_fb();
+        }
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("34553582650-v0ntcv1f4bv0cjg7frsqmtu2tpkt5eir.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
 
         mLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 signOut();
+                signOut_google();
+                signOut_fb();
             }
         });
+
+        mName.setText(getIntent().getStringExtra("name"));
+        mEmail.setText(getIntent().getStringExtra("email"));
+
         if (!mTrackingLocation) {
             startTrackingLocation();
         } else {
             stopTrackingLocation();
         }
+
+    }
+    public void onDestroy(){
+        super.onDestroy();
+        this.finish();
+    }
+    @Override
+    public void onBackPressed() {
+    /*    mAuth.signOut();
+        LoginManager.getInstance().logOut();
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        revokeAccess();
+                    }
+                });
+    */    this.finish();
     }
 
     LocationCallback mLocationCallback = new LocationCallback() {
@@ -83,34 +122,44 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
                     (getLocationRequest(),
                             mLocationCallback,
                             null /* Looper */);
-        /*    mFusedLocationClient.getLastLocation().addOnSuccessListener(
-                    new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                new FetchAddressTask(ShowActivity.this,
-                                        ShowActivity.this).execute(location);
-                            } else {
-                                mLocation.setText(R.string.no_location);
-                            }
-                        }
-                    });  */
         }
         mLocation.setText(getString(R.string.address_text,getString(R.string.loading),System.currentTimeMillis()));
-        mAnimRotate.start();
     }
     private void signOut() {
 
         mAuth.signOut();
-        Intent intent = new Intent(ShowActivity.this,MainActivity.class);
-        startActivity(intent);
+        this.finish();
+        //Intent intent = new Intent(ShowActivity.this,MainActivity.class);
+        //startActivity(intent);
+    }
+    private void signOut_google() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        revokeAccess();
+                    }
+                });
+        this.finish();
+    }
+    private void signOut_fb(){
+        LoginManager.getInstance().logOut();
+        this.finish();
+    }
+    private void revokeAccess() {
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
     }
     private void stopTrackingLocation() {
         if (mTrackingLocation) {
             mTrackingLocation = false;
             mFusedLocationClient.removeLocationUpdates(mLocationCallback);
             signOut();
-            mAnimRotate.end();
         }
     }
     private LocationRequest getLocationRequest() {
@@ -148,4 +197,12 @@ public class ShowActivity extends MainActivity implements FetchAddressTask.OnTas
             mLocation.setText(getString(R.string.address_text, result, System.currentTimeMillis()));
         }
     }
+
+    public void CheckGpsStatus(){
+
+        locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+
+        GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
 }
